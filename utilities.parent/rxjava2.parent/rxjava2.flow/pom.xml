@@ -5,13 +5,8 @@
 		<artifactId>rxjava2.parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>rxjava2.window</artifactId>
+	<artifactId>rxjava2.flow</artifactId>
 	<dependencies>
-		<dependency>
-			<groupId>utilities</groupId>
-			<artifactId>rxjava2.flow</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

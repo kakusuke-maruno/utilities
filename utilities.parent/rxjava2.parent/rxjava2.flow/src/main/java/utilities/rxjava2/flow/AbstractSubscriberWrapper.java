@@ -1,4 +1,4 @@
-package utilities.rxjava2.window;
+package utilities.rxjava2.flow;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;

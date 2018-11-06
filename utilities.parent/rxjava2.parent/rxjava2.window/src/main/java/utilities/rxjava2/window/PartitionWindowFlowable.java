@@ -8,6 +8,7 @@ import org.reactivestreams.Subscriber;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
+import utilities.rxjava2.flow.AbstractSubscriberWrapper;
 
 public class PartitionWindowFlowable<T> extends Flowable<PartitionWindow<T>> {
 	public static <T> Function<Publisher<T>, PartitionWindowFlowable<T>> of(Function<T, Integer> partitionCalcurator, int partitionCount, int bufferSize) {
