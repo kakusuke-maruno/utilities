@@ -64,7 +64,7 @@ public class PartitionWindowFlowableTest {
 		AtomicLong counter_2 = new AtomicLong();
 		Flowable //
 				.range(1, count) //
-				.to(PartitionWindowFlowable.of(value -> value % partitionCount == 5 ? value % 0 : value % partitionCount, partitionCount, bufferSize)) //
+				.to(PartitionWindowFlowable.of(value -> value == 101 ? value % 0 : value % partitionCount, partitionCount, bufferSize)) //
 				.doOnNext(window -> {
 					counter_1.incrementAndGet();
 					counter_2.addAndGet(window.windowValues.size());
@@ -73,8 +73,8 @@ public class PartitionWindowFlowableTest {
 				}, t -> {
 				}) //
 		;
-		assertTrue("partitioned keys size is failed. " + 0 + ":" + counter_1.get(), 0 == counter_1.get());
-		assertTrue("partitioned values size is failed. " + 0 + ":" + counter_2.get(), 0 == counter_2.get());
+		assertTrue("partitioned keys size is failed. " + 10 + ":" + counter_1.get(), 10 == counter_1.get());
+		assertTrue("partitioned values size is failed. " + 100 + ":" + counter_2.get(), 100 == counter_2.get());
 	}
 
 }
