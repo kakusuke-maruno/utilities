@@ -6,11 +6,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
-import io.reactivex.plugins.RxJavaPlugins;
 
 public class KeyBreakWindowFlowable<K, V> extends Flowable<KeyBreakWindow<K, V>> {
 	public static <K, V> Function<Flowable<V>, Flowable<KeyBreakWindow<K, V>>> of(Function<V, K> keyCalcurator) {
@@ -30,37 +28,21 @@ public class KeyBreakWindowFlowable<K, V> extends Flowable<KeyBreakWindow<K, V>>
 		source.subscribe(new SubscriberWapper<>(s, keyCalcurator));
 	}
 
-	static class SubscriberWapper<K, V> implements Subscriber<V>, Subscription {
-		Subscription upstream;
-		final Subscriber<? super KeyBreakWindow<K, V>> downstream;
+	static class SubscriberWapper<K, V> extends AbstractSubscriberWrapper<V, KeyBreakWindow<K, V>> {
 		final Collection<V> buffer = new ArrayList<>();
 		final AtomicReference<K> lastKey = new AtomicReference<>();
 		final Function<V, K> keyCalcurator;
 		boolean done;
 
 		public SubscriberWapper(Subscriber<? super KeyBreakWindow<K, V>> downstream, Function<V, K> keyCalcurator) {
-			this.downstream = downstream;
+			super(downstream);
 			this.keyCalcurator = keyCalcurator;
 		}
 
 		@Override
-		public void onSubscribe(Subscription s) {
-			upstream = s;
-			downstream.onSubscribe(this);
-		}
-
-		@Override
-		public void onNext(V t) {
-			if (done) {
-				return;
-			}
+		public void onNext0(V t) throws Exception {
 			K key;
-			try {
-				key = keyCalcurator.apply(t);
-			} catch (Exception e) {
-				onError(e);
-				return;
-			}
+			key = keyCalcurator.apply(t);
 			if (lastKey.get() != null && !lastKey.get().equals(key)) {
 				downstream.onNext(new KeyBreakWindow<>(lastKey.get(), new ArrayList<>(buffer)));
 				buffer.clear();
@@ -70,37 +52,11 @@ public class KeyBreakWindowFlowable<K, V> extends Flowable<KeyBreakWindow<K, V>>
 		}
 
 		@Override
-		public void onError(Throwable t) {
-			if (done) {
-				RxJavaPlugins.onError(t);
-				return;
-			}
-			done = true;
-			downstream.onError(t);
-		}
-
-		@Override
-		public void onComplete() {
-			if (done) {
-				return;
-			}
+		public void onComplete0() {
 			if (buffer.size() > 0) {
 				downstream.onNext(new KeyBreakWindow<>(lastKey.get(), new ArrayList<>(buffer)));
 				buffer.clear();
 			}
-			done = true;
-			downstream.onComplete();
 		}
-
-		@Override
-		public void request(long n) {
-			upstream.request(n);
-		}
-
-		@Override
-		public void cancel() {
-			upstream.cancel();
-		}
-
 	}
 }

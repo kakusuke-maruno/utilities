@@ -5,11 +5,9 @@ import java.util.Collection;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
-import io.reactivex.plugins.RxJavaPlugins;
 
 public class PartitionWindowFlowable<T> extends Flowable<PartitionWindow<T>> {
 	public static <T> Function<Publisher<T>, PartitionWindowFlowable<T>> of(Function<T, Integer> partitionCalcurator, int partitionCount, int bufferSize) {
@@ -34,9 +32,7 @@ public class PartitionWindowFlowable<T> extends Flowable<PartitionWindow<T>> {
 		source.subscribe(wrappedSubscriber);
 	}
 
-	static class SubscriberWapper<T> implements Subscriber<T>, Subscription {
-		Subscription upstream;
-		final Subscriber<? super PartitionWindow<T>> downstream;
+	static class SubscriberWapper<T> extends AbstractSubscriberWrapper<T, PartitionWindow<T>> {
 		final Collection<T>[] buffer;
 		final Function<T, Integer> partitionCalcurator;
 		final int partitionCount;
@@ -45,7 +41,7 @@ public class PartitionWindowFlowable<T> extends Flowable<PartitionWindow<T>> {
 
 		@SuppressWarnings("unchecked")
 		public SubscriberWapper(Subscriber<? super PartitionWindow<T>> downstream, int partitionCount, Function<T, Integer> partitionCalcurator, int bufferSize) {
-			this.downstream = downstream;
+			super(downstream);
 			this.partitionCalcurator = partitionCalcurator;
 			this.partitionCount = partitionCount;
 			this.bufferSize = bufferSize;
@@ -56,61 +52,23 @@ public class PartitionWindowFlowable<T> extends Flowable<PartitionWindow<T>> {
 		}
 
 		@Override
-		public void onSubscribe(Subscription s) {
-			upstream = s;
-			downstream.onSubscribe(this);
-		}
-
-		@Override
-		public void onNext(T t) {
-			if (done) {
-				return;
-			}
-			try {
-				int partition = partitionCalcurator.apply(t);
-				buffer[partition].add(t);
-				if (buffer[partition].size() >= bufferSize) {
-					downstream.onNext(new PartitionWindow<>(partition, new ArrayList<>(buffer[partition])));
-					buffer[partition].clear();
-				}
-			} catch (Exception e) {
-				onError(e);
+		public void onNext0(T t) throws Exception {
+			int partition = partitionCalcurator.apply(t);
+			buffer[partition].add(t);
+			if (buffer[partition].size() >= bufferSize) {
+				downstream.onNext(new PartitionWindow<>(partition, new ArrayList<>(buffer[partition])));
+				buffer[partition].clear();
 			}
 		}
 
 		@Override
-		public void onError(Throwable t) {
-			if (done) {
-				RxJavaPlugins.onError(t);
-				return;
-			}
-			done = true;
-			downstream.onError(t);
-		}
-
-		@Override
-		public void onComplete() {
-			if (done) {
-				return;
-			}
+		public void onComplete0() {
 			for (int partition = 0; partition < buffer.length; partition++) {
 				if (buffer[partition].size() > 0) {
 					downstream.onNext(new PartitionWindow<>(partition, new ArrayList<>(buffer[partition])));
 					buffer[partition].clear();
 				}
 			}
-			done = true;
-			downstream.onComplete();
-		}
-
-		@Override
-		public void request(long n) {
-			upstream.request(n);
-		}
-
-		@Override
-		public void cancel() {
-			upstream.cancel();
 		}
 	}
 }
