@@ -15,5 +15,6 @@
 	</properties>
 	<modules>
 		<module>rxjava2.parent</module>
+		<module>java8.parent</module>
 	</modules>
 </project>
