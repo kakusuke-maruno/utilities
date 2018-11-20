@@ -2,15 +2,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>utilities</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>nanohttpd.parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>java8.parent</artifactId>
-	<packaging>pom</packaging>
-	<modules>
-		<module>java8.bits</module>
-		<module>java8.collection</module>
-		<module>java8.objects</module>
-		<module>java8.annotations</module>
-	</modules>
+	<artifactId>nanohttpd.rxjava2</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>utilities</groupId>
+			<artifactId>rxjava2.flow</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>

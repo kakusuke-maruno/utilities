@@ -5,12 +5,19 @@
 		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>java8.parent</artifactId>
+	<artifactId>nanohttpd.parent</artifactId>
 	<packaging>pom</packaging>
+	<properties>
+		<rxjava2.version>2.2.3</rxjava2.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.ericsson.research.trap.transports</groupId>
+			<artifactId>http-impl-nanohttpd-nio</artifactId>
+			<version>1.4.2</version>
+		</dependency>
+	</dependencies>
 	<modules>
-		<module>java8.bits</module>
-		<module>java8.collection</module>
-		<module>java8.objects</module>
-		<module>java8.annotations</module>
+		<module>nanohttpd.rxjava2</module>
 	</modules>
 </project>
