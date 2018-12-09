@@ -17,5 +17,6 @@
 		<module>rxjava2.parent</module>
 		<module>java8.parent</module>
 		<module>nanohttpd.parent</module>
+		<module>scalecubeio.parent</module>
 	</modules>
 </project>
