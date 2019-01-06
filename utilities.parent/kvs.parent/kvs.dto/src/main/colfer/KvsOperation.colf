@@ -1,0 +1,81 @@
+package dto
+
+type DefaultOperationResult struct {
+	dataType		uint8
+	id				uint64
+	error			text
+}
+
+type BooleanOperationResult struct {
+	dataType		uint8
+	id				uint64
+	error			text
+	result			bool
+}
+
+type PutOperation struct {
+	dataType		uint8
+	kvs				uint32
+	id				uint64
+	key				binary
+	value			binary
+}
+
+type GetOperation struct {
+	dataType		uint8
+	kvs				uint32
+	id				uint64
+	key				binary
+}
+
+type GetOperationResult struct {
+	dataType		uint8
+	id				uint64
+	error			text
+	value			binary
+}
+
+type RemoveOperation struct {
+	dataType		uint8
+	kvs				uint32
+	id				uint64
+	key				binary
+}
+
+type PutIfAbsentOperation struct {
+	dataType		uint8
+	kvs				uint32
+	id				uint64
+	key				binary
+	value			binary
+}
+
+type CompareAndPutOperation struct {
+	dataType		uint8
+	kvs				uint32
+	id				uint64
+	key				binary
+	value			binary
+	expect			binary
+}
+
+type CompareAndRemoveOperation struct {
+	dataType		uint8
+	kvs				uint32
+	id				uint64
+	key				binary
+	expect			binary
+}
+
+type BatchEntry struct {
+	dataType		uint8
+	key				binary
+	value			binary
+}
+
+type WriteOperation struct {
+	dataType		uint8
+	kvs				uint32
+	id				uint64
+	batch			[]BatchEntry
+}
