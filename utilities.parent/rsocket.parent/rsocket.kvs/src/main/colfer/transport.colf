@@ -1,0 +1,30 @@
+package transport
+
+type kvsEventMeta struct {
+	id				uint64
+	eventType		uint8
+}
+
+type kvsEntry struct {
+	key				binary
+	value			binary
+}
+
+type kvsEvent struct {
+	kvs				uint32
+	name			text
+	properties		text
+	key				binary
+	value			binary
+	expected		binary
+	keys			[]binary
+	updates			[]kvsEntry
+}
+
+type kvsEventResult struct {
+	error			text
+	kvs				uint32
+	value			binary
+	result			bool
+	entries			[]kvsEntry
+}
