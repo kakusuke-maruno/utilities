@@ -19,5 +19,6 @@
 		<module>nanohttpd.parent</module>
 		<module>rsocket.parent</module>
 		<module>kvs.parent</module>
+		<module>trap.nanohttpd.parent</module>
 	</modules>
 </project>
