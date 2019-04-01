@@ -1,9 +1,8 @@
 package utilities.trap.nanohttpd.api;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ericsson.research.trap.nhttpd.HTTPD;
 import com.ericsson.research.trap.nhttpd.Request;
+import com.ericsson.research.trap.nhttpd.RequestHandler;
 import com.ericsson.research.trap.nhttpd.Response;
 import com.ericsson.research.trap.nhttpd.StatusCodes;
 
@@ -75,6 +75,9 @@ public class WebApiServer {
 
 			ConnectableFlux<MessageContext> stream = Flux //
 				.from(instance.processor) //
+				.doOnNext(messageContext -> {
+					LOG.info("url:[{}]", messageContext.getRequest().getUri());
+				}) //
 				.doOnComplete(instance::shutdown) //
 				.publish() //
 			;
@@ -83,7 +86,13 @@ public class WebApiServer {
 				@Override
 				public void execute(Request request, Response response) throws WebApiException {
 					response.setStatus(StatusCodes.OK).setData("shutting down...");
-					instance.processor.onComplete();
+					new Thread(() -> {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+						}
+						instance.processor.onComplete();
+					}).start();
 				}
 
 				@Override
@@ -106,6 +115,7 @@ public class WebApiServer {
 			urls //
 				.forEach(entry -> {
 					Pattern pattern = Pattern.compile(entry.getKey());
+					LOG.debug("urlPattern:[{}]", entry.getKey());
 					WebApiWrapper service = entry.getValue();
 					stream //
 						.filter(message -> pattern.matcher(message.getRequest().getUri()).find()) //
@@ -114,14 +124,41 @@ public class WebApiServer {
 				}) //
 			;
 			stream.connect();
+			try {
+				instance.httpd.setHandler(new RequestHandler() {
+					@Override
+					public void handleRequest(Request request, Response response) {
+						instance.processor.onNext(new MessageContext(request, response));
+					}
+				});
+				instance.httpd.start();
+			} catch (IOException e) {
+				LOG.error("initialize error", e);
+				instance.shutdown();
+				return null;
+			}
 			return instance;
 		}
 	}
 
 	private static Entry<String, WebApiWrapper> toEntry(String urlPattern, WebApiWrapper service) {
-		Map<String, WebApiWrapper> map = new HashMap<>();
-		map.put(urlPattern, service);
-		return map.entrySet().stream().findFirst().get();
+		return new Entry<String, WebApiWrapper>() {
+
+			@Override
+			public String getKey() {
+				return urlPattern;
+			}
+
+			@Override
+			public WebApiWrapper getValue() {
+				return service;
+			}
+
+			@Override
+			public WebApiWrapper setValue(WebApiWrapper value) {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 
 	private HTTPD httpd;

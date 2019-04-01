@@ -6,4 +6,20 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>trap.nanohttpd.api</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.8</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

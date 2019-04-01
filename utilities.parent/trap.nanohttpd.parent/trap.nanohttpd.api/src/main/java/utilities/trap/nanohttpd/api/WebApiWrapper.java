@@ -51,6 +51,7 @@ class WebApiWrapper {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("{} was completed.", this.getClass().getName());
 		}
-		service.onComplete();
+		if (service != null)
+			service.onComplete();
 	}
 }
