@@ -1,0 +1,13 @@
+package sample
+
+type Address struct {
+	zipcode			text
+	street			text
+}
+
+type Person struct {
+	name			text
+	age				uint8
+	sex				bool
+	address			[]Address
+}

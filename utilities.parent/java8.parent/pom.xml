@@ -12,5 +12,6 @@
 		<module>java8.collection</module>
 		<module>java8.objects</module>
 		<module>java8.annotations</module>
+		<module>java8.serialization</module>
 	</modules>
 </project>
