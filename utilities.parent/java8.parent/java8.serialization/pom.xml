@@ -53,7 +53,8 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>colf-java</id>
+						<id>colf-java-test</id>
+						<phase>generate-test-sources</phase>
 						<goals>
 							<goal>compile</goal>
 						</goals>
