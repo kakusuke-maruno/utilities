@@ -8,7 +8,7 @@ public class BinaryUtility {
 	private BinaryUtility() {
 	}
 
-	public static void write(Writer writer, byte[] data) {
+	public static void writeHexString(Writer writer, byte[] data) {
 		try {
 			for (byte b : data) {
 				writer.write(String.format("%02x", b));
@@ -19,7 +19,7 @@ public class BinaryUtility {
 
 	public static String toHexString(byte[] data) {
 		StringWriter writer = new StringWriter(data.length * 2);
-		write(writer, data);
+		writeHexString(writer, data);
 		writer.flush();
 		return writer.toString();
 	}
